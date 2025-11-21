@@ -1,0 +1,13 @@
+# Ignorar arquivos compilados e cache
+__pycache__/
+*.pyc
+
+# Ignorar variáveis de ambiente (SEGURANÇA: NUNCA SUBIR O .ENV)
+.env
+
+# Ignorar ambiente virtual
+*venv*
+*.env*
+
+# Ignorar arquivos de sistema
+.DS_Store

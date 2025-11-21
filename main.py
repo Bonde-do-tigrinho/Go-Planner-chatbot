@@ -4,6 +4,11 @@ from pydantic import BaseModel
 import google.generativeai as genai
 import os
 from typing import List, Optional
+from dotenv import load_dotenv  # <--- IMPORTANTE: Importar isso
+
+# --- CARREGAR VARIÁVEIS DE AMBIENTE ---
+# Isso força o Python a ler o arquivo .env que está na pasta
+load_dotenv()
 
 # --- DIAGNÓSTICO DE VERSÃO ---
 print(f"📚 Versão do google-generativeai instalada: {genai.__version__}")
@@ -18,14 +23,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Agora ele vai buscar tanto do sistema quanto do arquivo .env
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+
+if not GEMINI_API_KEY:
+    print("❌ ERRO CRÍTICO: GEMINI_API_KEY não encontrada! Verifique seu arquivo .env")
+else:
+    print(f"✅ Chave de API encontrada (termina com: ...{GEMINI_API_KEY[-4:]})")
+    genai.configure(api_key=GEMINI_API_KEY)
 
 # --- LÓGICA DE SELEÇÃO OTIMIZADA (PRIORIDADE: GEMINI 2.0) ---
 def setup_gemini_model():
     """
     Lista os modelos e prioriza o Gemini 2.0 Flash (mais rápido).
     """
+    if not GEMINI_API_KEY:
+        return None
+
     print("🔍 Buscando modelos disponíveis na sua conta...")
     try:
         available_models = []
