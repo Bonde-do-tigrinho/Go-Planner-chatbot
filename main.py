@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 import google.generativeai as genai
 import os
 from typing import List, Optional
@@ -107,9 +107,16 @@ class Activity(BaseModel):
     estimated_cost: str
 
 class ChatRequest(BaseModel):
-    destination: str
+    destination: Optional[str] = ""
     message: Optional[str] = None
     context: Optional[TripDestination] = None
+    
+    @field_validator('destination')
+    @classmethod
+    def validate_destination(cls, v):
+        if not v or (isinstance(v, str) and v.strip() == ""):
+            raise ValueError("Não é possível sugerir atividades se o destino estiver vazio. Preencha em DADOS da viagem para poder continuar.")
+        return v.strip()
 
 class ChatResponse(BaseModel):
     response: str
